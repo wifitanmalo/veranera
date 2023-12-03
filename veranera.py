@@ -2,57 +2,108 @@ import tkinter as tk
 
 import hashlib
 
-# Function to the principal page
+# ---------- Function to the principal page ----------
 def home():
-    global veranera, sign_in, sign_up, text
-    veranera = tk.Label(window, text = "Welcome to Veranera!", font = ("Verdana", 18))
+    global text, home_frame
+    home_frame = tk.Frame(window)
+    home_frame.pack()
+    veranera = tk.Label(home_frame, text = "Welcome to Veranera!", font = ("Verdana", 18))
     veranera.pack()
-    sign_in = tk.Button(window, text = "Sign in")
+    sign_in = tk.Button(home_frame, text = "Sign in", command = signin)
     sign_in.pack()
-    sign_up = tk.Button(window, text = "Sign up", command = signup)
+    sign_up = tk.Button(home_frame, text = "Sign up", command = signup)
     sign_up.pack()
-    text = tk.Label(window, text = "", font = ("Verdana", 10))
+    text = tk.Label(home_frame, text = "", font = ("Verdana", 10))
     text.pack()
 
-
-# Function to sign up
-def signup():
-    global the_email, signup_pass, email_error, email_text
-    veranera.pack_forget()
-    sign_in.pack_forget()
-    sign_up.pack_forget()
-    email_text = tk.Label(window, text = "Email:")
+# Function to enter the email
+def enter_email():
+    global the_email, email_error, email_text, register_frame
+    home_frame.pack_forget() # Deletes the home elements
+    register_frame = tk.Frame(window)
+    register_frame.pack()
+    email_text = tk.Label(register_frame, text = "Email:")
     email_text.pack()
-    the_email = tk.Entry(window, width = 22)
+    the_email = tk.Entry(register_frame, width = 22)
     the_email.pack()
-    email_error = tk.Label(window, text = "")
+    email_error = tk.Label(register_frame, text = "")
     email_error.pack()
-    next = tk.Button(window, text = "Next", command = create_email)
+
+# Function to delete the text of the email
+def empty_email():
+    the_email.delete(0, len(the_email.get()))
+    the_email.insert(0, "")
+
+# Function to show the password entry
+def enter_password():
+    global pass_text, the_pass
+    next.pack_forget()
+    the_email.pack_forget()
+    pass_text = tk.Label(register_frame, text = "Password:")
+    pass_text.pack()
+    the_pass = tk.Entry(register_frame, width = 22, show = "*")
+    the_pass.pack()
+    pass_error = tk.Label(register_frame, text = "")
+    pass_error.pack()
+
+# Function to delete text of the password
+def empty_pass():
+    the_pass.delete(0, len(the_email.get()))
+    the_pass.insert(0, "")
+    confirm_pass.delete(0, len(the_email.get()))
+    confirm_pass.insert(0, "")
+
+# ---------- Function to log in ----------
+def signin():
+    global next
+    enter_email()
+    next = tk.Button(register_frame, text = "Next", command = verify_email)
     next.pack()
-    def signup_pass():
-        global the_pass, pass_error, confirm_pass, pass_text, confirm_text, register
-        next.pack_forget()
-        the_email.pack_forget()
-        pass_text = tk.Label(window, text = "Password:")
-        pass_text.pack()
-        the_pass = tk.Entry(window, width = 22, show = "*")
-        the_pass.pack()
-        confirm_text = tk.Label(window, text = "Confirm password:")
-        confirm_text.pack()
-        confirm_pass = tk.Entry(window, width = 22, show = "*")
-        confirm_pass.pack()
-        pass_error = tk.Label(window, text = "")
-        pass_error.pack()
-        register = tk.Button(window, text = "Register", command = create_password)
-        register.pack()
+
+# Function to verify if the email exists
+def verify_email():
+    global pin, pass_error
+    email = the_email.get()
+    with open('registered_accounts.txt', 'r') as email_file:
+        accounts_list = email_file.readlines()
+        for line in range(0, len(accounts_list)):
+            account = accounts_list[line].split()
+            user = account[0]
+            pin = account[1]
+            if user == email:
+                email_error.config(text = email)
+                enter_password()
+                pass_error = tk.Label(register_frame, text = "")
+                pass_error.pack()
+                log_in = tk.Button(register_frame, text = "Log in", command = verify_password)
+                log_in.pack()
+                break
+        if user != email:
+            email_error.config(text = "- Email not founded")
+
+# Function to verify if the password it's corrects
+def verify_password():
+    password = the_pass.get()
+    if password == pin:
+        pass_error.config(text = "- Correct!")
+    else:
+        pass_error.config(text = "- Incorrect password")
+        the_pass.delete(0, len(the_email.get()))
+        the_pass.insert(0, "")
+
+# ---------- Function to register ----------
+def signup():
+    global next
+    enter_email()
+    next = tk.Button(register_frame, text = "Next", command = create_email)
+    next.pack()
 
 # Function to create an email
 def create_email():
-    global email, the_email, email_error
+    global email, confirm_text, pass_error, confirm_pass
     email_digits = "abcdefghijklmnopqrstuvwxyz0123456789._"
     valid_domains = ["@gmail.com", "@hotmail.com", "@yahoo.com",
                     "@outlook.com", "@correounivalle.edu.co"]
-
     counter = 0
     try:
         email = the_email.get()
@@ -76,20 +127,31 @@ def create_email():
                 counter = 3
         if counter == 1:
             email_error.config(text = "- The email already exists")
+            empty_email()
         elif counter == 2:
             email_error.config(text = "- Invalid username")
+            empty_email()
         elif counter == 3:
             email_error.config(text = "- Invalid domain")
+            empty_email()
         else:
             email_error.config(text = email)
-            signup_pass()
+            enter_password()
+            confirm_text = tk.Label(register_frame, text = "Confirm password:")
+            confirm_text.pack()
+            confirm_pass = tk.Entry(register_frame, width = 22, show = "*")
+            confirm_pass.pack()
+            pass_error = tk.Label(register_frame, text = "")
+            pass_error.pack()
+            register = tk.Button(register_frame, text = "Register", command = create_password)
+            register.pack()
     except:
+        empty_email()
         email_error.config(text = "- Error, try again")
-
 
 # Function to create a password
 def create_password():
-    global password, h, email
+    global password
     password = the_pass.get()
     confirm = confirm_pass.get()
     if password == confirm:
@@ -98,26 +160,18 @@ def create_password():
             hash = hashlib.sha256(password.encode("utf-8"))
             with open('registered_accounts.txt', 'a', encoding="utf-8") as register_file:
                 register_file.write(f"{email} {password} {hash.hexdigest()}\n")
-            email_text.pack_forget()
-            the_email.pack_forget()
-            email_error.pack_forget()
-            pass_text.pack_forget()
-            the_pass.pack_forget()
-            confirm_text.pack_forget()
-            confirm_pass.pack_forget()
-            pass_error.pack_forget()
-            register.pack_forget()
+            register_frame.pack_forget()
             home()
             text.config(text = "- You account was created succesfully!")
         else:
             pass_error.config(text = "- Weak password")
+            empty_pass()
     else:
         pass_error.config(text = "- Passwords don't match")
-
+        empty_pass()
 
 # Function to verify the strenght of the password
 def password_strength():
-    global password
     low = False
     up = False
     simbol = False
@@ -133,7 +187,7 @@ def password_strength():
             simbol = True
     return low and up and number and simbol and len(password) >= 10
 
-
+# ---------- This is where the code starts running ----------
 if __name__ == '__main__':
     # Create the window
     window = tk.Tk()
