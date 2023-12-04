@@ -1,6 +1,5 @@
 import tkinter as tk
 from tkinter import ttk
-
 import hashlib
 
 # ---------- Function to the principal page ----------
@@ -8,7 +7,8 @@ def home():
     global text, home_frame
     home_frame = tk.Frame(window)
     home_frame.pack()
-    welcome = tk.Label(home_frame, text = "Welcome to", font = ("Verdana", 18))
+    welcome = tk.Label(home_frame, text = "Welcome to",
+                       font = ("Verdana", 18))
     welcome.pack()
     veranera = ttk.Label(home_frame, image = logo)
     veranera.pack()
@@ -58,7 +58,8 @@ def empty_pass():
 def signin():
     global next
     enter_email()
-    next = tk.Button(account_frame, text = "Next", command = verify_email)
+    next = tk.Button(account_frame, text = "Next",
+                     command = verify_email)
     next.pack()
 
 # Function to verify if the email exists
@@ -76,11 +77,13 @@ def verify_email():
                 enter_password()
                 pass_error = tk.Label(account_frame, text = "")
                 pass_error.pack()
-                log_in = tk.Button(account_frame, text = "Log in", command = verify_password)
+                log_in = tk.Button(account_frame, text = "Log in",
+                                   command = verify_password)
                 log_in.pack()
                 break
         if user != email:
-            email_error.config(text = "- Email not founded", fg = "#FF0000")
+            email_error.config(text = "- Email not founded",
+                               fg = "#FF0000")
             empty_email()
 
 # Function to verify if the password it's corrects
@@ -90,7 +93,8 @@ def verify_password():
         account_frame.pack_forget()
         menu()
     else:
-        pass_error.config(text = "- Incorrect password", fg = "#FF0000")
+        pass_error.config(text = "- Incorrect password",
+                          fg = "#FF0000")
         the_pass.delete(0, len(the_email.get()))
         the_pass.insert(0, "")
 
@@ -98,7 +102,8 @@ def verify_password():
 def signup():
     global next
     enter_email()
-    next = tk.Button(account_frame, text = "Next", command = create_email)
+    next = tk.Button(account_frame, text = "Next",
+                     command = create_email)
     next.pack()
 
 # Function to create an email
@@ -131,28 +136,35 @@ def create_email():
             elif domain not in valid_domains:
                 counter = 3
         if counter == 1:
-            email_error.config(text = "- The email already exists", fg = "#FF0000")
+            email_error.config(text = "- The email already exists",
+                               fg = "#FF0000")
             empty_email()
         elif counter == 2:
-            email_error.config(text = "- Invalid username", fg = "#FF0000")
+            email_error.config(text = "- Invalid username",
+                               fg = "#FF0000")
             empty_email()
         elif counter == 3:
-            email_error.config(text = "- Invalid domain", fg = "#FF0000")
+            email_error.config(text = "- Invalid domain",
+                               fg = "#FF0000")
             empty_email()
         else:
             email_error.config(text = email, fg = "#808080")
             enter_password()
-            confirm_text = tk.Label(account_frame, text = "Confirm password:")
+            confirm_text = tk.Label(account_frame,
+                                    text = "Confirm password:")
             confirm_text.pack()
-            confirm_pass = tk.Entry(account_frame, width = 22, show = "*")
+            confirm_pass = tk.Entry(account_frame, width = 22,
+                                    show = "*")
             confirm_pass.pack()
             pass_error = tk.Label(account_frame, text = "")
             pass_error.pack()
-            register = tk.Button(account_frame, text = "Register", command = create_password)
+            register = tk.Button(account_frame, text = "Register",
+                                 command = create_password)
             register.pack()
     except:
         empty_email()
-        email_error.config(text = "- Error, try again", fg = "#FF0000")
+        email_error.config(text = "- Error, try again",
+                           fg = "#FF0000")
 
 # Function to create a password
 def create_password():
@@ -163,16 +175,20 @@ def create_password():
         if password_strength():
 
             hash = hashlib.sha256(password.encode("utf-8"))
-            with open('registered_accounts.txt', 'a', encoding="utf-8") as register_file:
-                register_file.write(f"{email} {password} {hash.hexdigest()}\n")
+            with open('registered_accounts.txt', 'a', encoding="utf-8") as file:
+                file.write(f"{email} {password} {hash.hexdigest()}\n")
             account_frame.pack_forget()
             home()
-            text.config(text = "- You account was created succesfully!", fg = "#008000")
+            text.config(text = "- Account created succesfully!",
+                        fg = "#008000")
         else:
-            pass_error.config(text = "- Weak password", fg = "#FF0000")
+            pass_error.config(text = password_requeriments,
+                              font = ("Verdana", 8), fg = "#FF0000",
+                              justify="left")
             empty_pass()
     else:
-        pass_error.config(text = "- Passwords don't match",fg = "#FF0000")
+        pass_error.config(text = "- Passwords don't match",
+                          fg = "#FF0000")
         empty_pass()
 
 # Function to verify the strenght of the password
@@ -209,7 +225,12 @@ def menu():
 
 # ---------- This is where the code starts running ----------
 if __name__ == '__main__':
-    # Create the window
+    password_requeriments = """Must contain:
+- a upper letter (A-Z)
+- a lowercase letter (a-z)
+- a number (0-9)
+- a symbol (@*$!?\&/.-_)
+- 10 characters long"""
     window = tk.Tk()
     icon = tk.PhotoImage(file = "icon.png")
     logo = tk.PhotoImage(file = "logo.png")
