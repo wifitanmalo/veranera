@@ -39,15 +39,13 @@ def empty_email():
 
 # Function to show the password entry
 def enter_password():
-    global pass_text, the_pass
+    global pass_text, the_pass, pass_error
     next.pack_forget()
     the_email.pack_forget()
     pass_text = tk.Label(account_frame, text = "Password:")
     pass_text.pack()
     the_pass = tk.Entry(account_frame, width = 22, show = "*")
     the_pass.pack()
-    pass_error = tk.Label(account_frame, text = "")
-    pass_error.pack()
 
 # Function to delete text of the password
 def empty_pass():
@@ -90,6 +88,7 @@ def verify_password():
     password = the_pass.get()
     if password == pin:
         account_frame.pack_forget()
+        menu()
     else:
         pass_error.config(text = "- Incorrect password", fg = "#FF0000")
         the_pass.delete(0, len(the_email.get()))
@@ -113,6 +112,8 @@ def create_email():
         email = the_email.get()
         username = email[0:email.index("@")]
         domain = email[email.index("@"):len(email)]
+        if len(username) == 0:
+            counter = 2
         with open('registered_accounts.txt', 'r') as email_file:
             accounts_list = email_file.readlines()
             for line in range(0, len(accounts_list)):
@@ -190,6 +191,21 @@ def password_strength():
         elif caracter in "@*$!?\&/.-_":
             simbol = True
     return low and up and number and simbol and len(password) >= 10
+
+# Function of the menu
+def menu():
+    tab = ttk.Notebook(window)
+    
+    plate = ttk.Frame(tab)
+    tab.add(plate, text = "Plates")
+    
+    table = ttk.Frame(tab)
+    tab.add(table, text = "Tables")
+
+    order = ttk.Frame(tab)
+    tab.add(order, text = "Orders")
+
+    tab.pack(expand = True, fil = "both")
 
 # ---------- This is where the code starts running ----------
 if __name__ == '__main__':
