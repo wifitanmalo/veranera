@@ -216,13 +216,6 @@ def logout():
 
 # ---------- Plates ----------
 
-# Function to clean the plate's entrys
-def clean_plate_entrys():
-    name_entry.delete(0, "end")
-    value_entry.delete(0, "end")
-    description_entry.delete(0, "end")
-    available_entry.delete(0, "end")
-
 # Function to get the values of the plate's entrys
 def plate_data():
     global name, value, description, available
@@ -231,47 +224,106 @@ def plate_data():
     description = description_entry.get()
     available = available_entry.get().capitalize()
 
+# Function to clean the plate's entrys
+def clean_plate_entrys():
+    name_entry.delete(0, "end")
+    value_entry.delete(0, "end")
+    description_entry.delete(0, "end")
+    available_entry.delete(0, "end")
+
 # Function to add a new plate in the table
 def add_plate():
-    available_list = ["Yes", "No"]
     try:
         plate_data()
         if len(name) == 0 or len(description) == 0:
             add_error.config(text="- There cannot be empty spaces",
                             fg="#FF0000")
             clean_plate_entrys()
-        elif available not in available_list:
+        elif name in plates_names:
+            add_error.config(text="- Plate's name already exists",
+                            fg="#FF0000")
+            clean_plate_entrys()
+        elif value < 1:
+            add_error.config(text="- Value only gets positive numbers",
+                            fg="#FF0000")
+            clean_plate_entrys()
+        elif available not in available_options:
             add_error.config(text="- Available only gets (Yes/No)",
                             fg="#FF0000")
             clean_plate_entrys()
         else:
+            if available == "Yes":
+                available_plates.append(name)
+                print(available_plates)
             plates_names.append(name)
-            print(plates_names)
             plates.insert('', 'end', values=(name, value, description, available))
             clean_plate_entrys()
             add_error.config(text="")
     except:
-        add_error.config(text="- Value only gets positive numbers",
+        add_error.config(text="- Error, try again",
                             fg="#FF0000")
         clean_plate_entrys()
 
 # Function to update the dates of a plate
 def update_plate():
-    selection = plates.selection()
-    if selection:
-        plate_data()
-        if name and value:
-            plates.item(selection, values=(name, value, description, available))
-            clean_plate_entrys()
+    try:
+        selection = plates.selection()
+        selected_name = plates.item(selection, "values")[0]
+        if selection:
+            plate_data()
+            if len(name) == 0 or len(description) == 0:
+                add_error.config(text="- There cannot be empty spaces",
+                                fg="#FF0000")
+                clean_plate_entrys()
+            elif value < 1:
+                add_error.config(text="- Value only gets positive numbers",
+                                fg="#FF0000")
+                clean_plate_entrys()
+            elif available not in available_options:
+                add_error.config(text="- Available only gets (Yes/No)",
+                                fg="#FF0000")
+                clean_plate_entrys()
+            else:
+                if selected_name != name:
+                    if name not in plates_names and available == "Yes":
+                        available_plates.append(name)
+                        available_plates.remove(selected_name)
+                    plates_names.remove(selected_name)
+                    plates_names.append(name)
+                    plates.item(selection, values=(name, value, description, available))
+                    clean_plate_entrys()
+                elif selected_name == name:
+                    if name not in available_plates and available == "Yes":
+                        available_plates.append(name)
+                    elif name in available_plates and available == "No":
+                        available_plates.remove(name)
+                    plates.item(selection, values=(name, value, description, available))
+                    clean_plate_entrys()
+                    add_error.config(text="")
+                else:
+                    add_error.config(text="- Plate's name already exists",
+                            fg="#FF0000")
+                    clean_plate_entrys()
+    except:
+        add_error.config(text="- Error, try again",
+                            fg="#FF0000")
+        clean_plate_entrys()
 
 # Function to delete a plate
 def delete_plate():
-    selection = plates.selection()
-    delete_name = plates.item(selection, "values")[0]
-    plates_names.remove(delete_name)
-    print(plates_names)
-    if selection:
-        plates.delete(selection)
+    try:
+        selection = plates.selection()
+        delete_name = plates.item(selection, "values")[0]
+        plates_names.remove(delete_name)
+        if delete_name in available_plates:
+            available_plates.remove(delete_name)
+        if selection:
+            plates.delete(selection)
+            clean_plate_entrys()
+    except:
+        add_error.config(text="- Error, try again",
+                            fg="#FF0000")
+        clean_plate_entrys()
 
 # Function to generate the plate's table
 def plates_table():
@@ -333,16 +385,122 @@ def tables():
     tree.pack()
 
 # ---------- Orders ----------
-def orders():
-    tree = ttk.Treeview(order)
-    tree["columns"] = ("Table's name", "Table's number")
-    tree.column("#0", width=0, stretch=tk.NO)
-    tree.column("Table's name", width=140, anchor=tk.CENTER)
-    tree.column("Table's number", width=140, anchor=tk.CENTER)
-    tree.heading("#0", text = "", anchor=tk.W)
-    tree.heading("Table's name", text="Table's name")
-    tree.heading("Table's number", text="Table's number")
-    tree.pack()
+
+# Function to get the values of the order's entrys
+def order_data():
+    global plate_name, table_number
+    plate_name = plate_entry.get()
+    table_number = int(table_entry.get())
+
+# Function to clean the plate's entrys
+def clean_order_entrys():
+    plate_entry.delete(0, "end")
+    table_entry.delete(0, "end")
+
+# Function to add a new order in the table
+def add_order():
+    try:
+        order_data()
+        if len(plate_name) == 0:
+            add_error.config(text="- There cannot be empty spaces",
+                            fg="#FF0000")
+            clean_order_entrys()
+        elif plate_name not in plates_names:
+            add_error.config(text="- Plate doesn't exists",
+                            fg="#FF0000")
+            clean_order_entrys()
+        elif plate_name not in available_plates:
+            add_error.config(text="- Plate isn't available",
+                            fg="#FF0000")
+            clean_order_entrys()
+        elif table_number < 1:
+            add_error.config(text="- Table number only gets positive numbers",
+                            fg="#FF0000")
+            clean_order_entrys()
+        else:
+            orders.insert('', 'end', values=(plate_name, table_number))
+            clean_order_entrys()
+            add_error.config(text="")
+    except:
+        add_error.config(text="- Error, try again",
+                            fg="#FF0000")
+        clean_order_entrys()
+
+# Function to update the dates of a plate
+def update_order():
+    try:
+        selection = orders.selection()
+        selected_name = orders.item(selection, "values")[0]
+        if selection:
+            order_data()
+            if len(name) == 0 or len(description) == 0:
+                add_error.config(text="- There cannot be empty spaces",
+                                fg="#FF0000")
+                clean_order_entrys()
+            elif value < 1:
+                add_error.config(text="- Value only gets positive numbers",
+                                fg="#FF0000")
+                clean_order_entrys()
+            elif available not in available_options:
+                add_error.config(text="- Available only gets (Yes/No)",
+                                fg="#FF0000")
+                clean_plate_entrys()
+            else:
+                if selected_name != name and name not in plates_names:
+                    plates_names.remove(selected_name)
+                    plates_names.append(name)
+                    orders.item(selection, values=(plate_name, table_number))
+                    clean_order_entrys()
+                elif selected_name == name:
+                    orders.item(selection, values=(plate_name, table_number))
+                    clean_order_entrys()
+                    add_error.config(text="")
+    except:
+        add_error.config(text="- Error, try again",
+                            fg="#FF0000")
+        clean_order_entrys()
+
+# Function to delete a plate
+def delete_order():
+    try:
+        selection = orders.selection()
+        if selection:
+            orders.delete(selection)
+    except:
+        add_error.config(text="- Error, try again",
+                            fg="#FF0000")
+        clean_order_entrys()
+
+
+def orders_table():
+    global orders, plate_entry, table_entry, add_error
+    columns = ("Plate's name:", "Table's number:")
+    orders = ttk.Treeview(order, columns=columns, show="headings")
+    orders.column("#0", width=0, stretch=tk.NO)
+    orders.column("Plate's name:", width=140, anchor=tk.CENTER)
+    orders.column("Table's number:", width=140, anchor=tk.CENTER)
+    orders.heading("#0", text = "", anchor=tk.W)
+    orders.heading("Plate's name:", text="Plate's name:")
+    orders.heading("Table's number:", text="Table's number:")
+    orders.pack()
+    add_frame = tk.Frame(order)
+    add_frame.pack()
+    plate_text = tk.Label(add_frame, text="Plate's name:")
+    plate_text.pack()
+    plate_entry = tk.Entry(add_frame)
+    plate_entry.pack()
+    table_text = tk.Label(add_frame, text="Table's number:")
+    table_text.pack()
+    table_entry = tk.Entry(add_frame)
+    table_entry.pack()
+    add_error = tk.Label(add_frame, text="")
+    add_error.pack()
+    add = tk.Button(add_frame, text="Add", command=add_order)
+    add.pack()
+    update = tk.Button(add_frame, text="Update", command=update_order)
+    update.pack()
+    delete = tk.Button(add_frame, text="Delete", command=delete_order)
+    delete.pack()
 
 # Function of the top menu
 def menu():
@@ -359,7 +517,7 @@ def menu():
 
     order = ttk.Frame(tab)
     tab.add(order, text="Orders")
-    orders()
+    orders_table()
 
     log_out = ttk.Frame(tab)
     logout_button = tk.Button(tab, text="Log out", command=logout)
@@ -370,6 +528,9 @@ def menu():
 # ---------- This is where the code starts running ----------
 if __name__ == '__main__':
     plates_names = []
+    available_plates = []
+    tables_numbers = []
+    available_options = ["Yes", "No"]
     password_requeriments = """Must contain:
 - a upper letter (A-Z)
 - a lowercase letter (a-z)
