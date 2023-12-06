@@ -245,7 +245,8 @@ def add_plate():
                             fg="#FF0000")
             clean_plate_entrys()
         else:
-                # Agregar el elemento al Treeview
+            plates_names.append(name)
+            print(plates_names)
             plates.insert('', 'end', values=(name, value, description, available))
             clean_plate_entrys()
             add_error.config(text="")
@@ -256,19 +257,21 @@ def add_plate():
 
 # Function to update the dates of a plate
 def update_plate():
-    seleccion = plates.selection()
-    if seleccion:
+    selection = plates.selection()
+    if selection:
         plate_data()
         if name and value:
-            plates.item(seleccion, values=(name, value, description, available))
+            plates.item(selection, values=(name, value, description, available))
             clean_plate_entrys()
 
 # Function to delete a plate
 def delete_plate():
-    seleccion = plates.selection()
-    print(plates.item(seleccion, "values")[0])
-    if seleccion:
-        plates.delete(seleccion)
+    selection = plates.selection()
+    delete_name = plates.item(selection, "values")[0]
+    plates_names.remove(delete_name)
+    print(plates_names)
+    if selection:
+        plates.delete(selection)
 
 # Function to generate the plate's table
 def plates_table():
@@ -366,6 +369,7 @@ def menu():
 
 # ---------- This is where the code starts running ----------
 if __name__ == '__main__':
+    plates_names = []
     password_requeriments = """Must contain:
 - a upper letter (A-Z)
 - a lowercase letter (a-z)
