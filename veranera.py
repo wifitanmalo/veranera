@@ -12,6 +12,8 @@ import random
 def home():
     global text, home_frame
     try:
+        back.pack_forget()
+        account_frame.pack_forget()
         tab.pack_forget()
     except:
         print("uwu")
@@ -68,7 +70,10 @@ def clean_pass():
 
 # Function to log in
 def signin():
-    global next
+    global next, back
+    back = tk.Button(window, text="Back",
+                     command=home)
+    back.pack()
     enter_email()
     next = tk.Button(account_frame, text="Next",
                      command=verify_email)
@@ -115,7 +120,10 @@ def verify_password():
 
 # Function to register an user
 def signup():
-    global next
+    global next, back
+    back = tk.Button(window, text="Back",
+                     command=home)
+    back.pack()
     enter_email()
     next = tk.Button(account_frame, text="Next",
                      command=create_email)
