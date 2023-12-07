@@ -5,26 +5,23 @@ from datetime import datetime
 import random
 
 
-# ---------- Principal page ----------
+# -------------------- Principal page --------------------
 
 
 # Function to go to the principal page
 def home():
     global text, home_frame
+    home_frame = tk.Frame(window)
+    home_frame.pack()
     try:
         back.pack_forget()
         account_frame.pack_forget()
-        tab.pack_forget()
-    except:
-        print("uwu")
-    finally:
-        home_frame = tk.Frame(window)
-        home_frame.pack()
-        welcome = tk.Label(home_frame, text="Welcome to",
-                        font = ("Verdana", 18))
-        welcome.pack()
         veranera = ttk.Label(home_frame, image=logo)
         veranera.pack()
+        tab.pack_forget()
+    except:
+        print("- Home error")
+    finally:
         sign_in = tk.Button(home_frame, text="Sign in", command=signin)
         sign_in.pack()
         sign_up = tk.Button(home_frame, text="Sign up", command=signup)
@@ -65,12 +62,13 @@ def clean_pass():
     confirm_pass.delete(0, "end")
 
 
-# ---------- Log in ----------
+# -------------------- Log in --------------------
 
 
 # Function to log in
 def signin():
     global next, back
+    veranera.pack_forget()
     back = tk.Button(window, text="Back",
                      command=home)
     back.pack()
@@ -83,31 +81,37 @@ def signin():
 def verify_email():
     global pin, pass_error
     email = the_email.get().lower()
-    with open('registered_accounts.txt', 'r') as email_file:
-        accounts_list = email_file.readlines()
-        for line in range(0, len(accounts_list)):
-            account = accounts_list[line].split()
-            user = account[0]
-            pin = account[1]
-            if user == email:
-                email_error.config(text=email, fg="#808080")
-                enter_password()
-                pass_error = tk.Label(account_frame, text="")
-                pass_error.pack()
-                log_in = tk.Button(account_frame, text="Log in",
-                                   command=verify_password)
-                log_in.pack()
-                break
-        if user != email:
-            email_error.config(text="- Email not founded",
-                               fg="#FF0000")
-            clean_email()
+    try:
+        with open('registered_accounts.txt', 'r') as email_file:
+            accounts_list = email_file.readlines()
+            for line in range(0, len(accounts_list)):
+                account = accounts_list[line].split()
+                user = account[0]
+                pin = account[1]
+                if user == email:
+                    email_error.config(text=email, fg="#808080")
+                    enter_password()
+                    pass_error = tk.Label(account_frame, text="")
+                    pass_error.pack()
+                    log_in = tk.Button(account_frame, text="Log in",
+                                    command=verify_password)
+                    log_in.pack()
+                    break
+            if user != email:
+                email_error.config(text="- Email not found",
+                                fg="#FF0000")
+                clean_email()
+    except FileNotFoundError:
+        email_error.config(text="- Unknown error",
+                                fg="#FF0000")
+        clean_email()
 
-# Function to verify if the password it's corrects
+# Function to verify if the password it's correct
 def verify_password():
     password = the_pass.get()
     if password == pin:
         account_frame.pack_forget()
+        back.pack_forget()
         tab.pack(expand=True, fil="both")
     else:
         pass_error.config(text="- Incorrect password",
@@ -115,12 +119,13 @@ def verify_password():
         the_pass.delete(0, "end")
 
 
-# ---------- Sign up ----------
+# -------------------- Sign up --------------------
 
 
 # Function to register an user
 def signup():
     global next, back
+    veranera.pack_forget()
     back = tk.Button(window, text="Back",
                      command=home)
     back.pack()
@@ -134,60 +139,53 @@ def create_email():
     global email, confirm_text, pass_error, confirm_pass
     email_digits = "abcdefghijklmnopqrstuvwxyz0123456789._"
     valid_domains = ["@gmail.com", "@hotmail.com", "@yahoo.com",
-                    "@outlook.com", "@correounivalle.edu.co"]
-    counter = 0
+                    "@outlook.es", "@correounivalle.edu.co"]
     try:
         email = the_email.get().lower()
-        username = email[0:email.index("@")]
+        user = email[0:email.index("@")]
         domain = email[email.index("@"):len(email)]
-        if len(username) == 0:
-            counter = 2
+        if len(user) == 0 or len(user) < 6 or len(user) > 30:
+            raise ValueError
+        elif domain not in valid_domains:
+            raise Exception
+        for word in user:
+            if word not in email_digits:
+                raise ValueError
         with open('registered_accounts.txt', 'r') as email_file:
             accounts_list = email_file.readlines()
             for line in range(0, len(accounts_list)):
                 account = accounts_list[line].split()
-                user = account[0]
-                pin = account[1]
-                if user == email:
-                    counter = 1
-                    continue
-        for word in username:
-            if word not in email_digits:
-                counter = 2
-            elif len(username) < 6 or len(username) > 30:
-                counter = 2
-            elif domain not in valid_domains:
-                counter = 3
-        if counter == 1:
-            email_error.config(text="- The email already exists",
-                               fg="#FF0000")
-            clean_email()
-        elif counter == 2:
-            email_error.config(text="- Invalid username",
-                               fg="#FF0000")
-            clean_email()
-        elif counter == 3:
-            email_error.config(text="- Invalid domain",
-                               fg="#FF0000")
-            clean_email()
-        else:
-            email_error.config(text = email, fg = "#808080")
-            enter_password()
-            confirm_text = tk.Label(account_frame,
-                                    text = "Confirm password:")
-            confirm_text.pack()
-            confirm_pass = tk.Entry(account_frame, width = 22,
-                                    show = "*")
-            confirm_pass.pack()
-            pass_error = tk.Label(account_frame, text = "")
-            pass_error.pack()
-            register = tk.Button(account_frame, text = "Register",
-                                 command = create_password)
-            register.pack()
-    except:
+                if account[0] == email:
+                    raise KeyboardInterrupt
+        email_error.config(text=email, fg="#808080")
+        enter_password()
+        confirm_text = tk.Label(account_frame,
+                                text="Confirm password:")
+        confirm_text.pack()
+        confirm_pass = tk.Entry(account_frame, width = 22,
+                                show="*")
+        confirm_pass.pack()
+        pass_error = tk.Label(account_frame, text="")
+        pass_error.pack()
+        register = tk.Button(account_frame, text="Register",
+                            command=create_password)
+        register.pack() 
+    except ValueError:
+        email_error.config(text="- Invalid username",
+                                fg="#FF0000")
         clean_email()
-        email_error.config(text = "- Error, try again",
+    except FileNotFoundError:
+        email_error.config(text="- Unknown error",
+                                fg="#FF0000")
+        clean_email()
+    except KeyboardInterrupt:
+        email_error.config(text="- Email already exists",
+                                fg="#FF0000")
+        clean_email()
+    except:
+        email_error.config(text = "- Invalid domain",
                            fg = "#FF0000")
+        clean_email()
 
 # Function to create a password
 def create_password():
@@ -231,7 +229,7 @@ def password_strength():
     return low and up and number and simbol and len(password) >= 10
 
 
-# ---------- Plates ----------
+# -------------------- Plates --------------------
 
 
 # Function to get the values of the plate's entrys
@@ -253,16 +251,15 @@ def clean_plate_entrys():
 def add_plate():
     try:
         plate_data()
+        for item in plates.get_children():
+            if plates.item(item, "values")[0] == name:
+                raise KeyboardInterrupt
         if len(name) == 0 or len(description) == 0:
-            error_text1.config(text="- There cannot be empty spaces",
-                            fg="#FF0000")
-            clean_plate_entrys()
-        elif name in plates_names:
-            error_text1.config(text="- Plate's name already exists",
+            error_text1.config(text="- There can't be empty spaces",
                             fg="#FF0000")
             clean_plate_entrys()
         elif value < 1:
-            error_text1.config(text="- Value only gets positive numbers",
+            error_text1.config(text="- Negative numbers not allowed",
                             fg="#FF0000")
             clean_plate_entrys()
         elif available not in available_options:
@@ -272,11 +269,15 @@ def add_plate():
         else:
             if available == "Yes":
                 available_plates.append(name)
-            plates_names.append(name)
-            plates.insert('', 'end', values=(name, value, description, available))
+            plates.insert('', 'end', values=(name, f"${value}", description, available))
             error_text1.config(text="- Plate added succesfully",
                                fg="#008000")
             clean_plate_entrys()
+            print(available_plates)
+    except KeyboardInterrupt:
+        error_text1.config(text="- Plate's name already exists",
+                            fg="#FF0000")
+        clean_plate_entrys()
     except:
         error_text1.config(text="- Error, try again",
                             fg="#FF0000")
@@ -287,14 +288,18 @@ def update_plate():
     try:
         selection = plates.selection()
         selected_name = plates.item(selection, "values")[0]
+        selection = plates.selection()
         if selection:
             plate_data()
+            for item in plates.get_children():
+                if item != selection[0] and plates.item(item, "values")[0] == name:
+                    raise KeyboardInterrupt
             if len(name) == 0 or len(description) == 0:
-                error_text1.config(text="- There cannot be empty spaces",
+                error_text1.config(text="- There can't be empty spaces",
                                 fg="#FF0000")
                 clean_plate_entrys()
             elif value < 1:
-                error_text1.config(text="- Value only gets positive numbers",
+                error_text1.config(text="- Negative numbers not allowed",
                                 fg="#FF0000")
                 clean_plate_entrys()
             elif available not in available_options:
@@ -303,37 +308,37 @@ def update_plate():
                 clean_plate_entrys()
             else:
                 if selected_name != name:
-                    if name not in plates_names and available == "Yes":
+                    if selected_name not in available_plates and available == "Yes":
+                        available_plates.append(name)
+                    elif selected_name in available_plates and available == "No":
                         available_plates.append(name)
                         available_plates.remove(selected_name)
-                    plates_names.remove(selected_name)
-                    plates_names.append(name)
-                    plates.item(selection, values=(name, value, description, available))
-                    clean_plate_entrys()
+                    elif selected_name in available_plates and available == "Yes":
+                        available_plates.append(name)
+                        available_plates.remove(selected_name)
                 elif selected_name == name:
                     if name not in available_plates and available == "Yes":
                         available_plates.append(name)
                     elif name in available_plates and available == "No":
                         available_plates.remove(name)
-                    plates.item(selection, values=(name, value, description, available))
-                    error_text1.config(text="- Plate updated succesfully",
-                                       fg="#008000")
-                    clean_plate_entrys()
-                else:
-                    error_text1.config(text="- Plate's name already exists",
+                plates.item(selection, values=(name, f"${value}", description, available))
+                error_text1.config(text="- Plate updated succesfully",
+                                    fg="#008000")
+                clean_plate_entrys()
+    except KeyboardInterrupt:
+        error_text1.config(text="- Plate's name already exists",
                             fg="#FF0000")
-                    clean_plate_entrys()
+        clean_plate_entrys()
     except:
         error_text1.config(text="- Error, try again",
                             fg="#FF0000")
-        clean_plate_entrys()
+        clean_plate_entrys()          
 
 # Function to delete a plate
 def delete_plate():
     try:
         selection = plates.selection()
         delete_name = plates.item(selection, "values")[0]
-        plates_names.remove(delete_name)
         if delete_name in available_plates:
             available_plates.remove(delete_name)
         if selection:
@@ -388,7 +393,8 @@ def plates_table():
     delete.pack()
 
 
-# ---------- Tables ----------
+# -------------------- Tables --------------------
+
 
 # Function to get the values of the table's entrys
 def table_data():
@@ -415,11 +421,11 @@ def book_table():
             if int(tables.item(item, "values")[0]) == the_table and tables.item(item, "values")[1] == date and tables.item(item, "values")[2] == hour:
                 raise KeyboardInterrupt
         if people < 1:
-            error_text2.config(text="- Number of people must be positive",
+            error_text2.config(text="- Negative numbers not allowed",
                             fg="#FF0000")
             clean_table_entrys()
-        elif people > 8:
-            error_text2.config(text="- Number of people can't be more than 8",
+        elif people > 10:
+            error_text2.config(text="- People can't be more than 10",
                             fg="#FF0000")
             clean_table_entrys()
         else:
@@ -448,7 +454,7 @@ def update_table():
                 if item != selection[0] and int(tables.item(item, "values")[0]) == the_table and tables.item(item, 'values')[1] == date and tables.item(item, 'values')[2] == hour:
                     raise KeyboardInterrupt
             if people < 1:
-                error_text2.config(text="- Number of people must be positive",
+                error_text2.config(text="- Negative numbers not allowed",
                                 fg="#FF0000")
                 clean_table_entrys()
             else:
@@ -517,7 +523,7 @@ def tables_data():
     delete.pack()
 
 
-# ---------- Orders ----------
+# -------------------- Orders --------------------
 
 
 # Function to get the values of the order's entrys
@@ -536,11 +542,7 @@ def add_order():
     try:
         order_data()
         if len(plate_name) == 0:
-            error_text3.config(text="- There cannot be empty spaces",
-                            fg="#FF0000")
-            clean_order_entrys()
-        elif plate_name not in plates_names:
-            error_text3.config(text="- Plate doesn't exists",
+            error_text3.config(text="- There can't be empty spaces",
                             fg="#FF0000")
             clean_order_entrys()
         elif plate_name not in available_plates:
@@ -548,11 +550,11 @@ def add_order():
                             fg="#FF0000")
             clean_order_entrys()
         elif table_number < 1:
-            error_text3.config(text="- Table number only gets positive numbers",
+            error_text3.config(text="- Negative numbers not allowed",
                             fg="#FF0000")
             clean_order_entrys()
         elif table_number not in reserved_tables:
-            error_text3.config(text="- The table isn't reserved yet",
+            error_text3.config(text="- Table not reserved yet",
                             fg="#FF0000")
             clean_order_entrys()
         else:
@@ -569,15 +571,14 @@ def add_order():
 def update_order():
     try:
         selection = orders.selection()
-        selected_name = orders.item(selection, "values")[0]
         if selection:
             order_data()
             if len(plate_name) == 0:
-                error_text3.config(text="- There cannot be empty spaces",
+                error_text3.config(text="- Can't be empty spaces",
                                 fg="#FF0000")
                 clean_order_entrys()
             elif table_number < 1:
-                error_text3.config(text="- Value only gets positive numbers",
+                error_text3.config(text="- Negative numbers not allowed",
                                 fg="#FF0000")
                 clean_order_entrys()
             elif plate_name not in available_plates:
@@ -585,10 +586,15 @@ def update_order():
                             fg="#FF0000")
                 clean_order_entrys()
             else:
-                orders.item(selection, values=(plate_name, table_number))
+                orders.item(selection,
+                            values=(plate_name, table_number))
                 error_text3.config(text="- Order updated succesfully",
                                     fg="#008000")
                 clean_order_entrys()
+        else:
+            error_text3.config(text="- Select an order first",
+                            fg="#FF0000")
+            clean_order_entrys()    
     except:
         error_text3.config(text="- Error, try again",
                             fg="#FF0000")
@@ -596,18 +602,16 @@ def update_order():
 
 # Function to delete a plate
 def delete_order():
-    try:
-        selection = orders.selection()
-        if selection:
-            orders.delete(selection)
-            error_text3.config(text="- Order deleted succesfully",
-                                       fg="#008000")
-        clean_order_entrys()
-    except:
-        error_text3.config(text="- Error, try again",
+    selection = orders.selection()
+    if selection:
+        orders.delete(selection)
+        error_text3.config(text="- Order deleted succesfully",
+                            fg="#008000")
+    else:
+        error_text3.config(text="- Select an order first",
                             fg="#FF0000")
-        clean_order_entrys()
-
+    clean_order_entrys()
+    
 # Function to generate the order's table
 def orders_table():
     global orders, plate_entry, table_entry, error_text3
@@ -639,10 +643,10 @@ def orders_table():
     delete.pack()
 
 
-# ---------- Menu ----------
+# -------------------- Menu --------------------
 
 
-# Function of the top menu
+# Function to generate the top menu
 def menu():
     global tab, plate, table, order
     tab = ttk.Notebook(window)
@@ -659,7 +663,10 @@ def menu():
     logout_button = tk.Button(tab, text="Log out", command=home)
     logout_button.pack()
 
-# ---------- This is where the code starts running ----------
+
+# -------------------- This is where the code starts running --------------------
+
+
 if __name__ == '__main__':
     reserved_tables = []
     plates_names = []
@@ -672,13 +679,19 @@ if __name__ == '__main__':
 - a number (0-9)
 - a symbol (@*$!?\&/.-_)
 - 10 characters long"""
-    window = tk.Tk()
-    icon = tk.PhotoImage(file="icon.png")
-    logo = tk.PhotoImage(file="logo.png")
-    window.iconphoto(True, icon)
-    window.title("Coffee shop: veranera")
-    window.geometry("300x510")
-    window.resizable(False, False)
-    home()
-    menu()
-    window.mainloop()
+    try:
+        window = tk.Tk()
+        icon = tk.PhotoImage(file="icon.png")
+        logo = tk.PhotoImage(file="logo.png")
+        window.iconphoto(True, icon)
+        veranera = ttk.Label(window, image=logo)
+        veranera.pack()
+    except:
+        print("- Error loading images")
+    finally:
+        window.title("Coffee shop: veranera")
+        window.geometry("300x510")
+        window.resizable(False, False)
+        home()
+        menu()
+        window.mainloop()
