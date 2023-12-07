@@ -1,8 +1,12 @@
 import tkinter as tk
 from tkinter import ttk
 import hashlib
+from datetime import datetime
+import random
+
 
 # ---------- Principal page ----------
+
 
 # Function to go to the principal page
 def home():
@@ -58,7 +62,9 @@ def clean_pass():
     the_pass.delete(0, "end")
     confirm_pass.delete(0, "end")
 
+
 # ---------- Log in ----------
+
 
 # Function to log in
 def signin():
@@ -103,7 +109,9 @@ def verify_password():
                           fg="#FF0000")
         the_pass.delete(0, "end")
 
+
 # ---------- Sign up ----------
+
 
 # Function to register an user
 def signup():
@@ -214,7 +222,9 @@ def password_strength():
             simbol = True
     return low and up and number and simbol and len(password) >= 10
 
+
 # ---------- Plates ----------
+
 
 # Function to get the values of the plate's entrys
 def plate_data():
@@ -333,12 +343,10 @@ def plates_table():
     global plates, name_entry, value_entry, description_entry, available_entry, error_text1
     columns = ("Name", "Value", "Description", "Available")
     plates = ttk.Treeview(plate, columns=columns, show="headings")
-    plates.column("#0", width=0, stretch=tk.NO)
     plates.column("Name", width=60, anchor=tk.CENTER)
     plates.column("Value", width=60, anchor=tk.CENTER)
     plates.column("Description", width=80)
     plates.column("Available", width=80, anchor=tk.CENTER)
-    plates.heading("#0", text = "", anchor=tk.W)
     plates.heading("Name", text="Name")
     plates.heading("Value", text="Value")
     plates.heading("Description", text="Description")
@@ -371,23 +379,138 @@ def plates_table():
     delete = tk.Button(add_frame, text="Delete", command=delete_plate)
     delete.pack()
 
+
 # ---------- Tables ----------
-def tables():
-    tree = ttk.Treeview(table)
-    tree["columns"] = ("Table", "Date", "Time", "People amount")
-    tree.column("#0", width=0, stretch=tk.NO)
-    tree.column('Table', width=60, anchor=tk.CENTER)
-    tree.column("Date", width=60, anchor=tk.CENTER)
-    tree.column("Time", width=60)
-    tree.column("People amount", width=100, anchor=tk.CENTER)
-    tree.heading("#0", text = "", anchor=tk.W)
-    tree.heading('Table', text='Table')
-    tree.heading("Date", text="Date")
-    tree.heading("Time", text="Time")
-    tree.heading("People amount", text="People amount")
-    tree.pack()
+
+# Function to get the values of the table's entrys
+def table_data():
+    global random_table, date, hour, people, date_format, hour_format
+    random_table = random.randint(1, 9)
+    date = date_entry.get()
+    hour = hour_entry.get()
+    people = int(people_entry.get())
+    date_format = datetime.strptime(date, "%d/%m/%Y")
+    hour_format = datetime.strptime(hour, "%H:%M")
+
+# Function to clean the table's entrys
+def clean_table_entrys():
+    date_entry.delete(0, "end")
+    hour_entry.delete(0, "end")
+    people_entry.delete(0, "end")
+
+# Function to add a reservation to the table
+def book_table():
+    try:
+        table_data()
+        the_table = random_table
+        for item in tables.get_children():
+            if int(tables.item(item, "values")[0]) == the_table and tables.item(item, "values")[1] == date and tables.item(item, "values")[2] == hour:
+                raise KeyboardInterrupt
+        if people < 1:
+            error_text2.config(text="- Number of people must be positive",
+                            fg="#FF0000")
+            clean_table_entrys()
+        elif people > 8:
+            error_text2.config(text="- Number of people can't be more than 8",
+                            fg="#FF0000")
+            clean_table_entrys()
+        else:
+            tables.insert('', 'end', values=(the_table, date, hour, people))
+            reserved_tables.append(the_table)
+            error_text2.config(text="- Table reserved succesfully",
+                               fg="#008000")
+            clean_table_entrys()
+    except ValueError:
+        error_text2.config(text="- Invalid date or hour",
+                            fg="#FF0000")
+        clean_table_entrys()
+    except KeyboardInterrupt:
+        error_text2.config(text="- Table not available for that date",
+                            fg="#FF0000")
+        clean_table_entrys()
+
+# Function to update the dates of a plate
+def update_table():
+    try:
+        selection = tables.selection()
+        if selection:
+            table_data()
+            the_table = random_table
+            for item in tables.get_children():
+                if item != selection[0] and int(tables.item(item, "values")[0]) == the_table and tables.item(item, 'values')[1] == date and tables.item(item, 'values')[2] == hour:
+                    raise KeyboardInterrupt
+            if people < 1:
+                error_text2.config(text="- Number of people must be positive",
+                                fg="#FF0000")
+                clean_table_entrys()
+            else:
+                tables.item(selection, values=(int(tables.item(item, "values")[0]), date, hour, people))
+                error_text2.config(text="- Table updated succesfully",
+                                fg="#008000")
+                clean_table_entrys()
+    except ValueError:
+        error_text2.config(text="- Invalid date or hour",
+                            fg="#FF0000")
+        clean_table_entrys()
+    except KeyboardInterrupt:
+        error_text2.config(text="- Table not available for that date",
+                            fg="#FF0000")
+        clean_table_entrys()
+
+# Function to delete a table reservation
+def delete_table():
+    try:
+        selection = tables.selection()
+        selected_table = int(tables.item(selection, "values")[0])
+        if selection:
+            tables.delete(selection)
+            reserved_tables.remove(selected_table)
+            clean_table_entrys()
+    except:
+        error_text2.config(text="- Error, try again",
+                            fg="#FF0000")
+        clean_table_entrys()
+
+# Function to generate the table's table
+def tables_data():
+    global tables, date_entry, hour_entry, people_entry, error_text2
+    columns = ("Table", "Date", "Hour", "# of people")
+    tables = ttk.Treeview(table, columns=columns, show="headings")
+    tables.column("Table", width=60, anchor=tk.CENTER)
+    tables.column("Date", width=80, anchor=tk.CENTER)
+    tables.column("Hour", width=60)
+    tables.column("# of people", width=80, anchor=tk.CENTER)
+    tables.heading("Table", text="Table")
+    tables.heading("Date", text="Date")
+    tables.heading("Hour", text="Hour")
+    tables.heading("# of people", text="# of people")
+    tables.pack()
+    add_frame = tk.Frame(table)
+    add_frame.pack()
+    date_text = tk.Label(add_frame, text="Date (DD/MM/YYYY):")
+    date_text.pack()
+    date_entry = tk.Entry(add_frame)
+    date_entry.pack()
+    hour_text = tk.Label(add_frame, text="Hour (HH:MM):")
+    hour_text.pack()
+    hour_entry = tk.Entry(add_frame)
+    hour_entry.pack()
+    people_text = tk.Label(add_frame, text="Amount of people:")
+    people_text.pack()
+    people_entry = tk.Entry(add_frame)
+    people_entry.pack()
+    error_text2 = tk.Label(add_frame, text="")
+    error_text2.pack()
+    add = tk.Button(add_frame, text="Add", command=book_table)
+    add.pack()
+    update = tk.Button(add_frame, text="Update", command=update_table)
+    update.pack()
+    delete = tk.Button(add_frame, text="Delete", command=delete_table)
+    delete.pack()
+
 
 # ---------- Orders ----------
+
 
 # Function to get the values of the order's entrys
 def order_data():
@@ -418,6 +541,10 @@ def add_order():
             clean_order_entrys()
         elif table_number < 1:
             error_text3.config(text="- Table number only gets positive numbers",
+                            fg="#FF0000")
+            clean_order_entrys()
+        elif table_number not in reserved_tables:
+            error_text3.config(text="- The table isn't reserved yet",
                             fg="#FF0000")
             clean_order_entrys()
         else:
@@ -473,12 +600,11 @@ def delete_order():
                             fg="#FF0000")
         clean_order_entrys()
 
-
+# Function to generate the order's table
 def orders_table():
     global orders, plate_entry, table_entry, error_text3
     columns = ("Plate's name:", "Table's number:")
     orders = ttk.Treeview(order, columns=columns, show="headings")
-    orders.column("#0", width=0, stretch=tk.NO)
     orders.column("Plate's name:", width=140, anchor=tk.CENTER)
     orders.column("Table's number:", width=140, anchor=tk.CENTER)
     orders.heading("#0", text = "", anchor=tk.W)
@@ -504,23 +630,23 @@ def orders_table():
     delete = tk.Button(add_frame, text="Delete", command=delete_order)
     delete.pack()
 
-# ---------- Function of the top menu ----------
+
+# ---------- Menu ----------
+
+
+# Function of the top menu
 def menu():
     global tab, plate, table, order
     tab = ttk.Notebook(window)
-    
     plate = ttk.Frame(tab)
     tab.add(plate, text="Plates")
     plates_table()
-    
     table = ttk.Frame(tab)
     tab.add(table, text="Tables")
-    tables()
-
+    tables_data()
     order = ttk.Frame(tab)
     tab.add(order, text="Orders")
     orders_table()
-
     log_out = ttk.Frame(tab)
     logout_button = tk.Button(tab, text="Log out", command=home)
     logout_button.pack()
@@ -542,7 +668,7 @@ if __name__ == '__main__':
     icon = tk.PhotoImage(file="icon.png")
     logo = tk.PhotoImage(file="logo.png")
     window.iconphoto(True, icon)
-    window.title("Cafetería: veranera")
+    window.title("Coffee shop: veranera")
     window.geometry("300x510")
     window.resizable(False, False)
     home()
