@@ -89,12 +89,12 @@ def verify_email():
     global pin, pass_error
     email = the_email.get().lower()
     try:
-        with open('registered_accounts.txt', 'r') as email_file:
+        with open('registered_accounts.txt', 'r', encoding="utf-8") as email_file:
             accounts_list = email_file.readlines()
             for line in range(0, len(accounts_list)):
                 account = accounts_list[line].split()
                 user = account[0]
-                pin = account[1]
+                pin = account[2]
                 if user == email:
                     email_error.config(text=email, fg="#808080")
                     enter_password()
@@ -116,8 +116,9 @@ def verify_email():
 # Function to verify if the password it's correct
 def verify_password():
     password = the_pass.get()
-    print(password.encode("utf-8"))
-    if password.encode("utf-8") == pin.encode("utf-8"):
+    hash = hashlib.sha256(password.encode("utf-8"))
+    print(hash.hexdigest(), pin)
+    if hash.hexdigest() == pin:
         account_frame.pack_forget()
         back_frame.pack_forget()
         tab.pack(expand=True, fil="both")
@@ -200,7 +201,7 @@ def create_password():
     if password == confirm:
         if password_strength():
             hash = hashlib.sha256(password.encode("utf-8"))
-            with open('registered_accounts.txt', 'a') as file:
+            with open('registered_accounts.txt', 'a', encoding="utf-8") as file:
                 file.write(f"{email} {password} {hash.hexdigest()}\n")
             account_frame.pack_forget()
             back_frame.pack_forget()
