@@ -7,21 +7,31 @@ import random
 
 # -------------------- Principal page --------------------
 
-
 # Function to go to the principal page
 def home():
     global text, home_frame
     home_frame = tk.Frame(window)
     home_frame.pack()
     try:
-        back.pack_forget()
+        back_frame.pack_forget()
         account_frame.pack_forget()
-        veranera = ttk.Label(home_frame, image=logo)
-        veranera.pack()
         tab.pack_forget()
     except:
-        print("- Home error")
+        print("- Start error")
     finally:
+        message = tk.Label(home_frame,
+                       font=("Verdana", 9),
+                       justify="center",
+                       text="""
+In Veranera we pride ourselves on offering
+a unique experience that combines delicious
+flavors, a cozy atmosphere and a variety of 
+services to satisfy your tastes and needs.
+Come and discover the charm of Veranera
+where every sip tells a story and every bite
+is a delicious adventure!
+""")
+        message.pack()
         sign_in = tk.Button(home_frame, text="Sign in", command=signin)
         sign_in.pack()
         sign_up = tk.Button(home_frame, text="Sign up", command=signup)
@@ -64,18 +74,15 @@ def clean_pass():
 
 # -------------------- Log in --------------------
 
-
 # Function to log in
 def signin():
-    global next, back
-    veranera.pack_forget()
-    back = tk.Button(window, text="Back",
-                     command=home)
+    global next
     back.pack()
     enter_email()
     next = tk.Button(account_frame, text="Next",
-                     command=verify_email)
+                         command=verify_email)
     next.pack()
+    back_frame.pack()
 
 # Function to verify if the email exists
 def verify_email():
@@ -109,9 +116,10 @@ def verify_email():
 # Function to verify if the password it's correct
 def verify_password():
     password = the_pass.get()
-    if password == pin:
+    print(password.encode("utf-8"))
+    if password.encode("utf-8") == pin.encode("utf-8"):
         account_frame.pack_forget()
-        back.pack_forget()
+        back_frame.pack_forget()
         tab.pack(expand=True, fil="both")
     else:
         pass_error.config(text="- Incorrect password",
@@ -121,18 +129,15 @@ def verify_password():
 
 # -------------------- Sign up --------------------
 
-
 # Function to register an user
 def signup():
-    global next, back
-    veranera.pack_forget()
-    back = tk.Button(window, text="Back",
-                     command=home)
+    global next
     back.pack()
     enter_email()
     next = tk.Button(account_frame, text="Next",
-                     command=create_email)
+                    command=create_email)
     next.pack()
+    back_frame.pack()
 
 # Function to create an email
 def create_email():
@@ -183,7 +188,7 @@ def create_email():
                                 fg="#FF0000")
         clean_email()
     except:
-        email_error.config(text = "- Invalid domain",
+        email_error.config(text = "- Invalid email",
                            fg = "#FF0000")
         clean_email()
 
@@ -195,15 +200,20 @@ def create_password():
     if password == confirm:
         if password_strength():
             hash = hashlib.sha256(password.encode("utf-8"))
-            with open('registered_accounts.txt', 'a', encoding="utf-8") as file:
+            with open('registered_accounts.txt', 'a') as file:
                 file.write(f"{email} {password} {hash.hexdigest()}\n")
             account_frame.pack_forget()
+            back_frame.pack_forget()
             home()
             text.config(text="- Account created succesfully!",
                         fg="#008000")
         else:
-            pass_error.config(text=password_requeriments,
-                              font=("Verdana", 8), fg = "#FF0000",
+            pass_error.config(text="""Must contain:
+- a lowercase letter (a-z)
+- a upper letter (A-Z)
+- a number (0-9)
+- a symbol (@*$!?\&/.-_)
+- 10 characters long""", font=("Verdana", 8), fg = "#FF0000",
                               justify="left")
             clean_pass()
     else:
@@ -229,8 +239,27 @@ def password_strength():
     return low and up and number and simbol and len(password) >= 10
 
 
-# -------------------- Plates --------------------
+# -------------------- Menu --------------------
 
+# Function to generate the top menu
+def menu():
+    global tab, plate, table, order
+    tab = ttk.Notebook(window)
+    plate = ttk.Frame(tab)
+    tab.add(plate, text="Plates")
+    plates_table()
+    table = ttk.Frame(tab)
+    tab.add(table, text="Tables")
+    tables_data()
+    order = ttk.Frame(tab)
+    tab.add(order, text="Orders")
+    orders_table()
+    log_out = ttk.Frame(tab)
+    logout_button = tk.Button(tab, text="Log out", command=home)
+    logout_button.pack()
+
+
+# -------------------- Plates --------------------
 
 # Function to get the values of the plate's entrys
 def plate_data():
@@ -262,7 +291,7 @@ def add_plate():
             error_text1.config(text="- Negative numbers not allowed",
                             fg="#FF0000")
             clean_plate_entrys()
-        elif available not in available_options:
+        elif available != "Yes" or available != "No":
             error_text1.config(text="- Available only gets (Yes/No)",
                             fg="#FF0000")
             clean_plate_entrys()
@@ -273,7 +302,6 @@ def add_plate():
             error_text1.config(text="- Plate added succesfully",
                                fg="#008000")
             clean_plate_entrys()
-            print(available_plates)
     except KeyboardInterrupt:
         error_text1.config(text="- Plate's name already exists",
                             fg="#FF0000")
@@ -302,7 +330,7 @@ def update_plate():
                 error_text1.config(text="- Negative numbers not allowed",
                                 fg="#FF0000")
                 clean_plate_entrys()
-            elif available not in available_options:
+            elif available != "Yes" or available != "No":
                 error_text1.config(text="- Available only gets (Yes/No)",
                                 fg="#FF0000")
                 clean_plate_entrys()
@@ -394,7 +422,6 @@ def plates_table():
 
 
 # -------------------- Tables --------------------
-
 
 # Function to get the values of the table's entrys
 def table_data():
@@ -525,7 +552,6 @@ def tables_data():
 
 # -------------------- Orders --------------------
 
-
 # Function to get the values of the order's entrys
 def order_data():
     global plate_name, table_number
@@ -642,45 +668,16 @@ def orders_table():
     delete = tk.Button(add_frame, text="Delete", command=delete_order)
     delete.pack()
 
-
-# -------------------- Menu --------------------
-
-
-# Function to generate the top menu
-def menu():
-    global tab, plate, table, order
-    tab = ttk.Notebook(window)
-    plate = ttk.Frame(tab)
-    tab.add(plate, text="Plates")
-    plates_table()
-    table = ttk.Frame(tab)
-    tab.add(table, text="Tables")
-    tables_data()
-    order = ttk.Frame(tab)
-    tab.add(order, text="Orders")
-    orders_table()
-    log_out = ttk.Frame(tab)
-    logout_button = tk.Button(tab, text="Log out", command=home)
-    logout_button.pack()
-
-
-# -------------------- This is where the code starts running --------------------
-
-
+# This is where the code starts running
 if __name__ == '__main__':
     reserved_tables = []
-    plates_names = []
     available_plates = []
-    tables_numbers = []
-    available_options = ["Yes", "No"]
-    password_requeriments = """Must contain:
-- a upper letter (A-Z)
-- a lowercase letter (a-z)
-- a number (0-9)
-- a symbol (@*$!?\&/.-_)
-- 10 characters long"""
     try:
         window = tk.Tk()
+        back_frame = tk.Frame(window)
+        back = tk.Button(back_frame, text="Back",
+                command=home)
+        back.pack()
         icon = tk.PhotoImage(file="icon.png")
         logo = tk.PhotoImage(file="logo.png")
         window.iconphoto(True, icon)
@@ -690,7 +687,7 @@ if __name__ == '__main__':
         print("- Error loading images")
     finally:
         window.title("Coffee shop: veranera")
-        window.geometry("300x510")
+        window.geometry("300x550")
         window.resizable(False, False)
         home()
         menu()
