@@ -116,7 +116,6 @@ def verify_email():
 def verify_password():
     password = the_pass.get()
     hash = hashlib.sha256(password.encode("utf-8"))
-    print(hash.hexdigest(), pin)
     if hash.hexdigest() == pin:
         account_frame.pack_forget()
         back_frame.pack_forget()
@@ -155,7 +154,7 @@ def create_email():
         for word in user:
             if word not in email_digits:
                 raise ValueError
-        with open('registered_accounts.txt', 'r') as email_file:
+        with open('registered_accounts.txt', 'r', encoding="utf-8") as email_file:
             accounts_list = email_file.readlines()
             for line in range(0, len(accounts_list)):
                 account = accounts_list[line].split()
@@ -558,7 +557,7 @@ def tables_data():
 # Function to get the values of the order's entrys
 def order_data():
     global plate_name, table_number
-    plate_name = plate_entry.get()
+    plate_name = plate_entry.get().capitalize()
     table_number = int(table_entry.get())
 
 # Function to clean the plate's entrys
