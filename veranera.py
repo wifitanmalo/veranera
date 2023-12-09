@@ -1,11 +1,26 @@
+"""
+Homework:
+- Final project (https://github.com/wifitanmalo/veranera)
+
+Members:
+- Andrés Felipe Castrillón Martínez (2380664)
+- Johan Alexander Castro Zapata (2380818)
+- Nicolás Chaparro González (2380530)
+
+Teacher:
+- Luis Germán Toro Pareja
+"""
+
+
 import tkinter as tk
 from tkinter import ttk
 import hashlib
-from datetime import datetime
 import random
+from datetime import datetime
 
 
 # -------------------- Principal page --------------------
+
 
 # Function to go to the principal page
 def home():
@@ -39,7 +54,7 @@ is a delicious adventure!
         text = tk.Label(home_frame, text="", font=("Verdana", 10))
         text.pack()
 
-# Function to enter the email
+# Function to display the email entry
 def enter_email():
     global the_email, email_error, email_text, account_frame
     home_frame.pack_forget()
@@ -52,11 +67,11 @@ def enter_email():
     email_error = tk.Label(account_frame, text="")
     email_error.pack()
 
-# Function to delete the text of the email
+# Function to delete the text of entry email
 def clean_email():
     the_email.delete(0, "end")
 
-# Function to show the password entry
+# Function to display the password entry
 def enter_password():
     global pass_text, the_pass, pass_error
     next.pack_forget()
@@ -66,7 +81,7 @@ def enter_password():
     the_pass = tk.Entry(account_frame, width=22, show="*")
     the_pass.pack()
 
-# Function to delete text of the password
+# Function to delete the text of the password entry
 def clean_pass():
     the_pass.delete(0, "end")
     confirm_pass.delete(0, "end")
@@ -74,7 +89,8 @@ def clean_pass():
 
 # -------------------- Log in --------------------
 
-# Function to log in
+
+# Function to go to the log in page
 def signin():
     global next
     enter_email()
@@ -83,7 +99,7 @@ def signin():
     next.pack()
     back_frame.pack()
 
-# Function to verify if the email exists
+# Function to verify if the email exists and display the password entry
 def verify_email():
     global pin, pass_error
     email = the_email.get().lower()
@@ -112,7 +128,7 @@ def verify_email():
                             fg="#FF0000")
         clean_email()
 
-# Function to verify if the password it's correct
+# Function to verify if the password it's correct and log in to the app
 def verify_password():
     password = the_pass.get()
     hash = hashlib.sha256(password.encode("utf-8"))
@@ -128,7 +144,8 @@ def verify_password():
 
 # -------------------- Sign up --------------------
 
-# Function to register an user
+
+# Function to go to the register page
 def signup():
     global next
     enter_email()
@@ -137,7 +154,7 @@ def signup():
     next.pack()
     back_frame.pack()
 
-# Function to create an email
+# Function to create an email and show the password/confirm entrys
 def create_email():
     global email, confirm_text, pass_error, confirm_pass
     email_digits = "abcdefghijklmnopqrstuvwxyz0123456789._"
@@ -190,7 +207,7 @@ def create_email():
                            fg = "#FF0000")
         clean_email()
 
-# Function to create a password
+# Function to register user data in the .txt file and encrypt password
 def create_password():
     global password
     password = the_pass.get()
@@ -239,6 +256,7 @@ def password_strength():
 
 # -------------------- Menu --------------------
 
+
 # Function to generate the top menu
 def menu():
     global tab, plate, table, order
@@ -259,7 +277,8 @@ def menu():
 
 # -------------------- Plates --------------------
 
-# Function to get the values of the plate's entrys
+
+# Function to get the values of the plate entrys
 def plate_data():
     global name, value, description, available
     name = name_entry.get().capitalize()
@@ -267,7 +286,7 @@ def plate_data():
     description = description_entry.get()
     available = available_entry.get().capitalize()
 
-# Function to clean the plate's entrys
+# Function to clean the plate entrys
 def clean_plate_entrys():
     name_entry.delete(0, "end")
     value_entry.delete(0, "end")
@@ -309,7 +328,7 @@ def add_plate():
                             fg="#FF0000")
         clean_plate_entrys()
 
-# Function to update the dates of a plate
+# Function to update the dates of a selected plate
 def update_plate():
     try:
         selection = plates.selection()
@@ -360,7 +379,7 @@ def update_plate():
                             fg="#FF0000")
         clean_plate_entrys()          
 
-# Function to delete a plate
+# Function to delete a selected plate
 def delete_plate():
     try:
         selection = plates.selection()
@@ -377,7 +396,7 @@ def delete_plate():
                             fg="#FF0000")
         clean_plate_entrys()
 
-# Function to generate the plate's table
+# Function to display the table of plates
 def plates_table():
     global plates, name_entry, value_entry, description_entry, available_entry, error_text1
     columns = ("Name", "Value", "Description", "Available")
@@ -421,7 +440,8 @@ def plates_table():
 
 # -------------------- Tables --------------------
 
-# Function to get the values of the table's entrys
+
+# Function to get the values of the table entrys
 def table_data():
     global random_table, date, hour, people, date_format, hour_format
     random_table = random.randint(1, 9)
@@ -431,7 +451,7 @@ def table_data():
     date_format = datetime.strptime(date, "%d/%m/%Y")
     hour_format = datetime.strptime(hour, "%H:%M")
 
-# Function to clean the table's entrys
+# Function to clean the table entrys
 def clean_table_entrys():
     date_entry.delete(0, "end")
     hour_entry.delete(0, "end")
@@ -468,7 +488,7 @@ def book_table():
                             fg="#FF0000")
         clean_table_entrys()
 
-# Function to update the dates of a plate
+# Function to update the dates of a selected reservation
 def update_table():
     try:
         selection = tables.selection()
@@ -514,7 +534,7 @@ def delete_table():
                             fg="#FF0000")
         clean_table_entrys()
 
-# Function to generate the table's table
+# Function to generate the tables table
 def tables_data():
     global tables, date_entry, hour_entry, people_entry, error_text2
     columns = ("Table", "Date", "Hour", "# of people")
@@ -554,13 +574,14 @@ def tables_data():
 
 # -------------------- Orders --------------------
 
-# Function to get the values of the order's entrys
+
+# Function to get the values of the order entrys
 def order_data():
     global plate_name, table_number
     plate_name = plate_entry.get().capitalize()
     table_number = int(table_entry.get())
 
-# Function to clean the plate's entrys
+# Function to clean the order entrys
 def clean_order_entrys():
     plate_entry.delete(0, "end")
     table_entry.delete(0, "end")
@@ -595,7 +616,7 @@ def add_order():
                             fg="#FF0000")
         clean_order_entrys()
 
-# Function to update the dates of a plate
+# Function to update the dates of a selected order
 def update_order():
     try:
         selection = orders.selection()
@@ -632,7 +653,7 @@ def update_order():
                             fg="#FF0000")
         clean_order_entrys()
 
-# Function to delete a plate
+# Function to delete a selected order
 def delete_order():
     selection = orders.selection()
     if selection:
@@ -644,7 +665,7 @@ def delete_order():
                             fg="#FF0000")
     clean_order_entrys()
     
-# Function to generate the order's table
+# Function to generate the orders table
 def orders_table():
     global orders, plate_entry, table_entry, error_text3
     columns = ("Plate's name:", "Table's number:")
