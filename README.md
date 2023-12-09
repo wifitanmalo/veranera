@@ -1,3 +1,5 @@
+![logo](logo.png)
+
 Veranera
 -------------
 _Veranera_ es una aplicación hecha con **Python** para administrar una cafetería, esta permite registrar un usuario para iniciar sesión y al hacerlo genera tres menús en los cuales se pueden crear platos, reservar mesas y realizar pedidos respectivamente, además de un botón para cerrar sesión cuando el empleado haya terminado su trabajo dentro de la aplicación.
