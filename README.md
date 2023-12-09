@@ -91,56 +91,58 @@ Al pulsar el botón de registro se llama una función con el nombre **singup()**
 Al final del cuadro se añadirá tanto un botón para enviar el correo como uno para devolverse a la página principal. Al enviar el correo se llama a la función **create_email()**:
 
 	def create_email():
-		global email, confirm_text, pass_error, confirm_pass
-		email_digits = "abcdefghijklmnopqrstuvwxyz0123456789._"
-		valid_domains = ["@gmail.com", "@hotmail.com", "@yahoo.com",
-						"@outlook.es", "@correounivalle.edu.co"]
-		try:
-			email = the_email.get().lower()
-			user = email[0:email.index("@")]
-			domain = email[email.index("@"):len(email)]
-			if len(user) == 0 or len(user) < 6 or len(user) > 30:
-				raise ValueError
-			elif domain not in valid_domains:
-				raise Exception
-			for word in user:
-				if word not in email_digits:
-					raise ValueError
-			with open('registered_accounts.txt', 'r', encoding="utf-8") as email_file:
-				accounts_list = email_file.readlines()
-				for line in range(0, len(accounts_list)):
-					account = accounts_list[line].split()
-					if account[0] == email:
-						raise KeyboardInterrupt
-			email_error.config(text=email, fg="#808080")
-			enter_password()
-			confirm_text = tk.Label(account_frame,
-									text="Confirm password:")
-			confirm_text.pack()
-			confirm_pass = tk.Entry(account_frame, width = 22,
-									show="*")
-			confirm_pass.pack()
-			pass_error = tk.Label(account_frame, text="")
-			pass_error.pack()
-			register = tk.Button(account_frame, text="Register",
-								command=create_password)
-			register.pack() 
-		except ValueError:
-			email_error.config(text="- Invalid username",
-								fg="#FF0000")
-			clean_email()
-		except FileNotFoundError:
-			email_error.config(text="- Unknown error",
-								fg="#FF0000")
-			clean_email()
-		except KeyboardInterrupt:
-			email_error.config(text="- Email already exists",
-								fg="#FF0000")
-			clean_email()
-		except:
-			email_error.config(text = "- Invalid email",
-							   fg = "#FF0000")
-			clean_email()
+    global email, confirm_text, pass_error, confirm_pass
+    email_digits = "abcdefghijklmnopqrstuvwxyz0123456789._"
+    valid_domains = ["@gmail.com", "@hotmail.com", "@yahoo.com",
+                    "@outlook.es", "@correounivalle.edu.co"]
+    try:
+        email = the_email.get().lower()
+        user = email[0:email.index("@")]
+        domain = email[email.index("@"):len(email)]
+        if (len(user) == 0) or (len(user) < 6) or (len(user) > 30):
+            raise ValueError
+        elif domain not in valid_domains:
+            raise Exception
+        for word in user:
+            if word not in email_digits:
+                raise ValueError
+        with open('registered_accounts.txt',
+                  'r',
+                  encoding="utf-8") as email_file:
+            accounts_list = email_file.readlines()
+            for line in range(0, len(accounts_list)):
+                account = accounts_list[line].split()
+                if account[0] == email:
+                    raise KeyboardInterrupt
+        email_error.config(text=email, fg="#808080")
+        enter_password()
+        confirm_text = tk.Label(account_frame,
+                                text="Confirm password:")
+        confirm_text.pack()
+        confirm_pass = tk.Entry(account_frame, width = 22,
+                                show="*")
+        confirm_pass.pack()
+        pass_error = tk.Label(account_frame, text="")
+        pass_error.pack()
+        register = tk.Button(account_frame, text="Register",
+                            command=create_password)
+        register.pack() 
+    except ValueError:
+        email_error.config(text="- Invalid username",
+                            fg="#FF0000")
+        clean_email()
+    except FileNotFoundError:
+        email_error.config(text="- Unknown error",
+                            fg="#FF0000")
+        clean_email()
+    except KeyboardInterrupt:
+        email_error.config(text="- Email already exists",
+                            fg="#FF0000")
+        clean_email()
+    except:
+        email_error.config(text = "- Invalid email",
+                           fg = "#FF0000")
+        clean_email()
 
 > Esta función se encarga de obtener el correo ingresado para verificar varios detalles:
 > - **Nombre de usuario mayor a 7 dígitos y menor a 30 y dominio de correo válido:**  para verificar el nombre de usuario se recorta el correo desde la primera letra hasta el @ y se asigna a la variable __user__, lo mismo se aplica para el dominio en la variable __domain__, pero desde el @ hasta la última letra del correo. Luego se aplica una condición comprobando que la longitud del nombre cumpla con la permitida y que el dominio se encuentre en la lista __valid_domains.__
@@ -268,38 +270,41 @@ Al entrar a la aplicación se generarán tres menús: uno para platos, otro para
 La sección de platos contendrá cuatro entradas: __nombre, valor, descripción y disponibilidad,__ las cuales pueden ser rellenadas por medio de la función **add_plate()** llamada por el botón agregar:
 
 	def add_plate():
-		try:
-			plate_data()
-			for item in plates.get_children():
-				if plates.item(item, "values")[0] == name:
-					raise KeyboardInterrupt
-			if len(name) == 0 or len(description) == 0:
-				error_text1.config(text="- There can't be empty spaces",
-								    fg="#FF0000")
-				clean_plate_entrys()
-			elif value < 1:
-				error_text1.config(text="- Negative numbers not allowed",
-								    fg="#FF0000")
-				clean_plate_entrys()
-			elif available not in available_options:
-				error_text1.config(text="- Available only gets (Yes/No)",
-								    fg="#FF0000")
-				clean_plate_entrys()
-			else:
-				if available == "Yes":
-					available_plates.append(name)
-				plates.insert('', 'end', values=(name, f"${value}", description, available))
-				error_text1.config(text="- Plate added succesfully",
-								   fg="#008000")
-				clean_plate_entrys()
-		except KeyboardInterrupt:
-			error_text1.config(text="- Plate's name already exists",
-								fg="#FF0000")
-			clean_plate_entrys()
-		except:
-			error_text1.config(text="- Error, try again",
-								fg="#FF0000")
-			clean_plate_entrys()
+    try:
+        plate_data()
+        for item in plates.get_children():
+            if plates.item(item, "values")[0] == name:
+                raise KeyboardInterrupt
+        if (len(name) == 0) or (len(description) == 0):
+            error_text1.config(text="- There can't be empty spaces",
+                                fg="#FF0000")
+            clean_plate_entrys()
+        elif value < 1:
+            error_text1.config(text="- Negative numbers not allowed",
+                                fg="#FF0000")
+            clean_plate_entrys()
+        elif available not in available_options:
+            error_text1.config(text="- Available only gets (Yes/No)",
+                                fg="#FF0000")
+            clean_plate_entrys()
+        else:
+            if available == "Yes":
+                available_plates.append(name)
+            plates.insert('', 'end', values=(name,
+                                             f"${value}",
+                                             description,
+                                             available))
+            error_text1.config(text="- Plate added succesfully",
+                               fg="#008000")
+            clean_plate_entrys()
+    except KeyboardInterrupt:
+        error_text1.config(text="- Plate's name already exists",
+                            fg="#FF0000")
+        clean_plate_entrys()
+    except:
+        error_text1.config(text="- Error, try again",
+                            fg="#FF0000")
+        clean_plate_entrys()
 
 > Esta función se encarga de llamar a la función **plate_data()** la cual obtiene los datos ingresados en los cuadros para luego revisar si cumplen con las siguientes condiciones:
 > - **Nombre no existente:** haciendo uso del comando **get_children()** se revisa el primer item de cada fila de la tabla para comprobar por medio de un ciclo for que el nombre no exista, en caso de existir suelta un error.
@@ -320,10 +325,11 @@ Al haber creado un plato satisfactoriamente, puedes seleccionarlo para actualiza
         if selection:
             plate_data()
             for item in plates.get_children():
-                if item != selection[0] and plates.item(item, "values")[0] == name:
+                if(item != selection[0]
+                   and plates.item(item, "values")[0] == name):
                     raise KeyboardInterrupt
-            if len(name) == 0 or len(description) == 0:
-                error_text1.config(text="- There can't be empty spaces",
+            if (len(name) == 0) or (len(description) == 0):
+                error_text1.config(text="- Can't leave empty spaces",
                                     fg="#FF0000")
                 clean_plate_entrys()
             elif value < 1:
@@ -336,20 +342,28 @@ Al haber creado un plato satisfactoriamente, puedes seleccionarlo para actualiza
                 clean_plate_entrys()
             else:
                 if selected_name != name:
-                    if selected_name not in available_plates and available == "Yes":
+                    if ((selected_name not in available_plates)
+                        and (available == "Yes")):
                         available_plates.append(name)
-                    elif selected_name in available_plates and available == "No":
+                    elif ((selected_name in available_plates)
+                          and (available == "No")):
                         available_plates.append(name)
                         available_plates.remove(selected_name)
-                    elif selected_name in available_plates and available == "Yes":
+                    elif ((selected_name in available_plates)
+                          and (available == "Yes")):
                         available_plates.append(name)
                         available_plates.remove(selected_name)
                 elif selected_name == name:
-                    if name not in available_plates and available == "Yes":
+                    if ((name not in available_plates)
+                        and (available == "Yes")):
                         available_plates.append(name)
-                    elif name in available_plates and available == "No":
+                    elif ((name in available_plates)
+                          and (available == "No")):
                         available_plates.remove(name)
-                plates.item(selection, values=(name, f"${value}", description, available))
+                plates.item(selection, values=(name,
+                                               f"${value}",
+                                               description,
+                                               available))
                 error_text1.config(text="- Plate updated succesfully",
                                     fg="#008000")
                 clean_plate_entrys()
@@ -393,7 +407,9 @@ Las mesas al igual que los platos poseen 4 casillas en la tabla: **Número de me
         table_data()
         the_table = random_table
         for item in tables.get_children():
-            if int(tables.item(item, "values")[0]) == the_table and tables.item(item, "values")[1] == date and tables.item(item, "values")[2] == hour:
+            if ((int(tables.item(item, "values")[0]) == the_table)
+                and (tables.item(item, "values")[1] == date)
+                and (tables.item(item, "values")[2] == hour)):
                 raise KeyboardInterrupt
         if people < 1:
             error_text2.config(text="- Negative numbers not allowed",
@@ -404,7 +420,10 @@ Las mesas al igual que los platos poseen 4 casillas en la tabla: **Número de me
                             fg="#FF0000")
             clean_table_entrys()
         else:
-            tables.insert('', 'end', values=(the_table, date, hour, people))
+            tables.insert('', 'end', values=(the_table,
+                                             date,
+                                             hour,
+                                             people))
             reserved_tables.append(the_table)
             error_text2.config(text="- Table reserved succesfully",
                                fg="#008000")

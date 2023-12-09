@@ -104,7 +104,9 @@ def verify_email():
     global pin, pass_error
     email = the_email.get().lower()
     try:
-        with open('registered_accounts.txt', 'r', encoding="utf-8") as email_file:
+        with open('registered_accounts.txt',
+                  'r',
+                  encoding="utf-8") as email_file:
             accounts_list = email_file.readlines()
             for line in range(0, len(accounts_list)):
                 account = accounts_list[line].split()
@@ -164,14 +166,16 @@ def create_email():
         email = the_email.get().lower()
         user = email[0:email.index("@")]
         domain = email[email.index("@"):len(email)]
-        if len(user) == 0 or len(user) < 6 or len(user) > 30:
+        if (len(user) == 0) or (len(user) < 6) or (len(user) > 30):
             raise ValueError
         elif domain not in valid_domains:
             raise Exception
         for word in user:
             if word not in email_digits:
                 raise ValueError
-        with open('registered_accounts.txt', 'r', encoding="utf-8") as email_file:
+        with open('registered_accounts.txt',
+                  'r',
+                  encoding="utf-8") as email_file:
             accounts_list = email_file.readlines()
             for line in range(0, len(accounts_list)):
                 account = accounts_list[line].split()
@@ -215,7 +219,9 @@ def create_password():
     if password == confirm:
         if password_strength():
             hash = hashlib.sha256(password.encode("utf-8"))
-            with open('registered_accounts.txt', 'a', encoding="utf-8") as file:
+            with open('registered_accounts.txt',
+                      'a',
+                      encoding="utf-8") as file:
                 file.write(f"{email} {password} {hash.hexdigest()}\n")
             account_frame.pack_forget()
             back_frame.pack_forget()
@@ -300,7 +306,7 @@ def add_plate():
         for item in plates.get_children():
             if plates.item(item, "values")[0] == name:
                 raise KeyboardInterrupt
-        if len(name) == 0 or len(description) == 0:
+        if (len(name) == 0) or (len(description) == 0):
             error_text1.config(text="- There can't be empty spaces",
                                 fg="#FF0000")
             clean_plate_entrys()
@@ -315,7 +321,10 @@ def add_plate():
         else:
             if available == "Yes":
                 available_plates.append(name)
-            plates.insert('', 'end', values=(name, f"${value}", description, available))
+            plates.insert('', 'end', values=(name,
+                                             f"${value}",
+                                             description,
+                                             available))
             error_text1.config(text="- Plate added succesfully",
                                fg="#008000")
             clean_plate_entrys()
@@ -337,10 +346,11 @@ def update_plate():
         if selection:
             plate_data()
             for item in plates.get_children():
-                if item != selection[0] and plates.item(item, "values")[0] == name:
+                if(item != selection[0]
+                   and plates.item(item, "values")[0] == name):
                     raise KeyboardInterrupt
-            if len(name) == 0 or len(description) == 0:
-                error_text1.config(text="- There can't be empty spaces",
+            if (len(name) == 0) or (len(description) == 0):
+                error_text1.config(text="- Can't leave empty spaces",
                                     fg="#FF0000")
                 clean_plate_entrys()
             elif value < 1:
@@ -353,20 +363,28 @@ def update_plate():
                 clean_plate_entrys()
             else:
                 if selected_name != name:
-                    if selected_name not in available_plates and available == "Yes":
+                    if ((selected_name not in available_plates)
+                        and (available == "Yes")):
                         available_plates.append(name)
-                    elif selected_name in available_plates and available == "No":
+                    elif ((selected_name in available_plates)
+                          and (available == "No")):
                         available_plates.append(name)
                         available_plates.remove(selected_name)
-                    elif selected_name in available_plates and available == "Yes":
+                    elif ((selected_name in available_plates)
+                          and (available == "Yes")):
                         available_plates.append(name)
                         available_plates.remove(selected_name)
                 elif selected_name == name:
-                    if name not in available_plates and available == "Yes":
+                    if ((name not in available_plates)
+                        and (available == "Yes")):
                         available_plates.append(name)
-                    elif name in available_plates and available == "No":
+                    elif ((name in available_plates)
+                          and (available == "No")):
                         available_plates.remove(name)
-                plates.item(selection, values=(name, f"${value}", description, available))
+                plates.item(selection, values=(name,
+                                               f"${value}",
+                                               description,
+                                               available))
                 error_text1.config(text="- Plate updated succesfully",
                                     fg="#008000")
                 clean_plate_entrys()
@@ -463,7 +481,9 @@ def book_table():
         table_data()
         the_table = random_table
         for item in tables.get_children():
-            if int(tables.item(item, "values")[0]) == the_table and tables.item(item, "values")[1] == date and tables.item(item, "values")[2] == hour:
+            if ((int(tables.item(item, "values")[0]) == the_table)
+                and (tables.item(item, "values")[1] == date)
+                and (tables.item(item, "values")[2] == hour)):
                 raise KeyboardInterrupt
         if people < 1:
             error_text2.config(text="- Negative numbers not allowed",
@@ -474,7 +494,10 @@ def book_table():
                             fg="#FF0000")
             clean_table_entrys()
         else:
-            tables.insert('', 'end', values=(the_table, date, hour, people))
+            tables.insert('', 'end', values=(the_table,
+                                             date,
+                                             hour,
+                                             people))
             reserved_tables.append(the_table)
             error_text2.config(text="- Table reserved succesfully",
                                fg="#008000")
@@ -496,7 +519,10 @@ def update_table():
             table_data()
             the_table = random_table
             for item in tables.get_children():
-                if item != selection[0] and int(tables.item(item, "values")[0]) == the_table and tables.item(item, 'values')[1] == date and tables.item(item, 'values')[2] == hour:
+                if ((item != selection[0])
+                    and (int(tables.item(item, "values")[0]) == the_table)
+                    and (tables.item(item, 'values')[1] == date)
+                    and (tables.item(item, 'values')[2] == hour)):
                     raise KeyboardInterrupt
             if people < 1:
                 error_text2.config(text="- Negative numbers not allowed",
@@ -507,7 +533,11 @@ def update_table():
                                    fg="#FF0000")
                 clean_table_entrys()
             else:
-                tables.item(selection, values=(int(tables.item(item, "values")[0]), date, hour, people))
+                tables.item(selection,
+                            values=(int(tables.item(item, "values")[0]),
+                                    date,
+                                    hour,
+                                    people))
                 error_text2.config(text="- Table updated succesfully",
                                     fg="#008000")
                 clean_table_entrys()
