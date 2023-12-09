@@ -42,7 +42,7 @@ is a delicious adventure!
 # Function to enter the email
 def enter_email():
     global the_email, email_error, email_text, account_frame
-    home_frame.pack_forget() # Deletes the home elements
+    home_frame.pack_forget()
     account_frame = tk.Frame(window)
     account_frame.pack()
     email_text = tk.Label(account_frame, text="Email:")
@@ -77,7 +77,6 @@ def clean_pass():
 # Function to log in
 def signin():
     global next
-    back.pack()
     enter_email()
     next = tk.Button(account_frame, text="Next",
                          command=verify_email)
@@ -106,11 +105,11 @@ def verify_email():
                     break
             if user != email:
                 email_error.config(text="- Email not found",
-                                fg="#FF0000")
+                                    fg="#FF0000")
                 clean_email()
     except FileNotFoundError:
         email_error.config(text="- Unknown error",
-                                fg="#FF0000")
+                            fg="#FF0000")
         clean_email()
 
 # Function to verify if the password it's correct
@@ -133,7 +132,6 @@ def verify_password():
 # Function to register an user
 def signup():
     global next
-    back.pack()
     enter_email()
     next = tk.Button(account_frame, text="Next",
                     command=create_email)
@@ -178,15 +176,15 @@ def create_email():
         register.pack() 
     except ValueError:
         email_error.config(text="- Invalid username",
-                                fg="#FF0000")
+                            fg="#FF0000")
         clean_email()
     except FileNotFoundError:
         email_error.config(text="- Unknown error",
-                                fg="#FF0000")
+                            fg="#FF0000")
         clean_email()
     except KeyboardInterrupt:
         email_error.config(text="- Email already exists",
-                                fg="#FF0000")
+                            fg="#FF0000")
         clean_email()
     except:
         email_error.config(text = "- Invalid email",
@@ -265,7 +263,7 @@ def menu():
 # Function to get the values of the plate's entrys
 def plate_data():
     global name, value, description, available
-    name = name_entry.get()
+    name = name_entry.get().capitalize()
     value = float(value_entry.get())
     description = description_entry.get()
     available = available_entry.get().capitalize()
@@ -286,15 +284,15 @@ def add_plate():
                 raise KeyboardInterrupt
         if len(name) == 0 or len(description) == 0:
             error_text1.config(text="- There can't be empty spaces",
-                            fg="#FF0000")
+                                fg="#FF0000")
             clean_plate_entrys()
         elif value < 1:
             error_text1.config(text="- Negative numbers not allowed",
-                            fg="#FF0000")
+                                fg="#FF0000")
             clean_plate_entrys()
-        elif available != "Yes" or available != "No":
+        elif available not in available_options:
             error_text1.config(text="- Available only gets (Yes/No)",
-                            fg="#FF0000")
+                                fg="#FF0000")
             clean_plate_entrys()
         else:
             if available == "Yes":
@@ -325,15 +323,15 @@ def update_plate():
                     raise KeyboardInterrupt
             if len(name) == 0 or len(description) == 0:
                 error_text1.config(text="- There can't be empty spaces",
-                                fg="#FF0000")
+                                    fg="#FF0000")
                 clean_plate_entrys()
             elif value < 1:
                 error_text1.config(text="- Negative numbers not allowed",
-                                fg="#FF0000")
+                                    fg="#FF0000")
                 clean_plate_entrys()
-            elif available != "Yes" or available != "No":
+            elif available not in available_options:
                 error_text1.config(text="- Available only gets (Yes/No)",
-                                fg="#FF0000")
+                                    fg="#FF0000")
                 clean_plate_entrys()
             else:
                 if selected_name != name:
@@ -373,7 +371,7 @@ def delete_plate():
         if selection:
             plates.delete(selection)
             error_text1.config(text="- Plate deleted succesfully",
-                                       fg="#008000")
+                                fg="#008000")
         clean_plate_entrys()
     except:
         error_text1.config(text="- Error, try again",
@@ -483,12 +481,16 @@ def update_table():
                     raise KeyboardInterrupt
             if people < 1:
                 error_text2.config(text="- Negative numbers not allowed",
-                                fg="#FF0000")
+                                    fg="#FF0000")
+                clean_table_entrys()
+            elif people > 10:
+                error_text2.config(text="- People can't be more than 10",
+                                   fg="#FF0000")
                 clean_table_entrys()
             else:
                 tables.item(selection, values=(int(tables.item(item, "values")[0]), date, hour, people))
                 error_text2.config(text="- Table updated succesfully",
-                                fg="#008000")
+                                    fg="#008000")
                 clean_table_entrys()
     except ValueError:
         error_text2.config(text="- Invalid date or hour",
@@ -570,19 +572,19 @@ def add_order():
         order_data()
         if len(plate_name) == 0:
             error_text3.config(text="- There can't be empty spaces",
-                            fg="#FF0000")
+                              fg="#FF0000")
             clean_order_entrys()
         elif plate_name not in available_plates:
             error_text3.config(text="- Plate isn't available",
-                            fg="#FF0000")
+                                fg="#FF0000")
             clean_order_entrys()
         elif table_number < 1:
             error_text3.config(text="- Negative numbers not allowed",
-                            fg="#FF0000")
+                                fg="#FF0000")
             clean_order_entrys()
         elif table_number not in reserved_tables:
             error_text3.config(text="- Table not reserved yet",
-                            fg="#FF0000")
+                                fg="#FF0000")
             clean_order_entrys()
         else:
             orders.insert('', 'end', values=(plate_name, table_number))
@@ -602,15 +604,19 @@ def update_order():
             order_data()
             if len(plate_name) == 0:
                 error_text3.config(text="- Can't be empty spaces",
-                                fg="#FF0000")
+                                  fg="#FF0000")
                 clean_order_entrys()
             elif table_number < 1:
                 error_text3.config(text="- Negative numbers not allowed",
-                                fg="#FF0000")
+                                   fg="#FF0000")
+                clean_order_entrys()
+            elif table_number not in reserved_tables:
+                error_text3.config(text="- Table not reserved yet",
+                                  fg="#FF0000")
                 clean_order_entrys()
             elif plate_name not in available_plates:
                 error_text3.config(text="- Plate isn't available",
-                            fg="#FF0000")
+                                   fg="#FF0000")
                 clean_order_entrys()
             else:
                 orders.item(selection,
@@ -620,7 +626,7 @@ def update_order():
                 clean_order_entrys()
         else:
             error_text3.config(text="- Select an order first",
-                            fg="#FF0000")
+                               fg="#FF0000")
             clean_order_entrys()    
     except:
         error_text3.config(text="- Error, try again",
@@ -646,7 +652,6 @@ def orders_table():
     orders = ttk.Treeview(order, columns=columns, show="headings")
     orders.column("Plate's name:", width=140, anchor=tk.CENTER)
     orders.column("Table's number:", width=140, anchor=tk.CENTER)
-    orders.heading("#0", text = "", anchor=tk.W)
     orders.heading("Plate's name:", text="Plate's name:")
     orders.heading("Table's number:", text="Table's number:")
     orders.pack()
@@ -673,6 +678,7 @@ def orders_table():
 if __name__ == '__main__':
     reserved_tables = []
     available_plates = []
+    available_options = ["Yes", "No"]
     try:
         window = tk.Tk()
         back_frame = tk.Frame(window)
